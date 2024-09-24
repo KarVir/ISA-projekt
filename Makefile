@@ -10,12 +10,12 @@ ZIPNAME = xvirag00.zip
 C                = g++
 CPPFLAGS               = -std=c++20
 EXTRA_CPPFLAGS         = -Wall -Wextra -pedantic -lpcap
-SRCS     = main.c
+SRCS     = isa-top.c
 ${TARGET}: ${SRCS} 
 	${C} ${CPPFLAGS} ${EXTRA_CPPFLAGS} -o ${TARGET} ${SRCS}
 	
 clean:
-	rm ipk-sniffer
+	rm isa-top
 
 zip: 
 	zip -v -r ${ZIPNAME} .* 
