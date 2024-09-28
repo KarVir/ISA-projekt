@@ -1,53 +1,54 @@
 #include "paket_handler.h"
-connection_stat_t connection[MAX_connection];
 int connection_count = 0;
 int zadano = 0;
+int packet_count = 0;
 
-
-void packet_handler(unsigned char *user __attribute__((unused)) , const struct pcap_pkthdr *header __attribute__((unused)) , const unsigned char *packet) {
+void packet_handler(unsigned char *user, const struct pcap_pkthdr *header __attribute__((unused)) , const unsigned char *packet) {
     const struct ether_header *ethernet = (struct ether_header *)packet;
+    packet_info_t *packets= (packet_info_t *)user;
+    if (packet_count < MAX_PACKETS) {
     switch (ntohs(ethernet->ether_type)) {
         case ETHERTYPE_IP: {
             // IPv4
-            uint16_t src_port;
-            uint16_t dst_port; 
-            char protokol[5];
+           // uint16_t src_port;
+//uint16_t dst_port; 
+            //char protokol[5];
             struct iphdr *ip_header = (struct iphdr *)(packet + sizeof(struct ether_header));
-            char src_ip[INET_ADDRSTRLEN];
-            char dst_ip[INET_ADDRSTRLEN];
+            //char src_ip[INET_ADDRSTRLEN];
+            //char dst_ip[INET_ADDRSTRLEN];
             
             // Convert source and destination IP addresses to string format
-            inet_ntop(AF_INET, &ip_header->saddr, src_ip, INET_ADDRSTRLEN);
-            inet_ntop(AF_INET, &ip_header->daddr, dst_ip, INET_ADDRSTRLEN);
+            inet_ntop(AF_INET, &ip_header->saddr, packets[packet_count].src_ip, INET_ADDRSTRLEN);
+            inet_ntop(AF_INET, &ip_header->daddr, packets[packet_count].dst_ip, INET_ADDRSTRLEN);
             
             // Print source and destination IP addresses
             
             // Print source and destination port if the protocol is TCP or UDP
             if (ip_header->protocol == IPPROTO_TCP) {
-                src_port = *((uint16_t *)(packet + sizeof(struct ether_header) + ip_header->ihl * 4));
-                dst_port = *((uint16_t *)(packet + sizeof(struct ether_header) + ip_header->ihl * 4 + 2));
-                strncpy(protokol, "TCP", sizeof(protokol));;
+                packets[packet_count].src_port = *((uint16_t *)(packet + sizeof(struct ether_header) + ip_header->ihl * 4));
+                packets[packet_count].dst_port = *((uint16_t *)(packet + sizeof(struct ether_header) + ip_header->ihl * 4 + 2));
+                strncpy(packets[packet_count].protocol, "TCP", sizeof(packets[packet_count].protocol));;
 
             }else if (ip_header->protocol == IPPROTO_UDP) {
-                src_port = *((uint16_t *)(packet + sizeof(struct ether_header) + ip_header->ihl * 4));
-                dst_port = *((uint16_t *)(packet + sizeof(struct ether_header) + ip_header->ihl * 4 + 2));
-                strncpy(protokol, "UDP", sizeof(protokol));
+                packets[packet_count].src_port = *((uint16_t *)(packet + sizeof(struct ether_header) + ip_header->ihl * 4));
+                packets[packet_count].dst_port = *((uint16_t *)(packet + sizeof(struct ether_header) + ip_header->ihl * 4 + 2));
+                strncpy(packets[packet_count].protocol, "UDP", sizeof(packets[packet_count].protocol));
             }else if (ip_header->protocol == IPPROTO_ICMP) {
                 /* TODO nic nevypisovat*/
-                src_port= 0;
-                dst_port= 0;
-                strncpy(protokol, "ICMP", sizeof(protokol));
+                packets[packet_count].src_port= 0;
+                packets[packet_count].dst_port= 0;
+                strncpy(packets[packet_count].protocol, "ICMP", sizeof(packets[packet_count].protocol));
             }else if (ip_header->protocol == IPPROTO_IGMP)
             {
             /* TODO nic nevypisovat*/
-                src_port= 0;
-                dst_port= 0;
-                strncpy(protokol, "IGMP", sizeof(protokol));
+                packets[packet_count].src_port= 0;
+                packets[packet_count].dst_port= 0;
+                strncpy(packets[packet_count].protocol, "IGMP", sizeof(packets[packet_count].protocol));
             }
             
-            uint16_t rx = header->len;
-            uint16_t tx = header->len;
-            printf("%s: %d\t\t%s: %d\t%s\t%u\t%u\n", src_ip, ntohs(src_port), dst_ip, ntohs(dst_port), protokol, rx, tx);
+            packets[packet_count].rx_bytes = header->len;
+            packets[packet_count].tx_bytes = header->len;
+         //   printf("%s: %d\t\t%s: %d\t%s\t%u\t%u\n",  packets[0].src_ip, ntohs(packets[0].src_port), packets[0].dst_ip, ntohs(packets[0].dst_port), packets[0].protocol, rx, tx);
             break;
         }
         case ETHERTYPE_IPV6: {
@@ -73,5 +74,7 @@ void packet_handler(unsigned char *user __attribute__((unused)) , const struct p
         }default:
             printf("Unknown Ethernet Type\n");
             break;
+    }
+            packet_count++;
     }
 }

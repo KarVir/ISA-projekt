@@ -17,14 +17,15 @@
 #include <ncurses.h>
 #include <ifaddrs.h>
 
-#define MAX_connection 1000
+#define MAX_PACKETS 10
 typedef struct {
     int time;
     char interface[255];
     char sorting_criteria[2];
 } arg_t;
-// Struktura pro ukládání statistik pro každé spojení
-typedef struct {
+// Struktura pro ukládání statistik pro každé spojen
+
+/*typedef struct {
     char src_ip[INET6_ADDRSTRLEN];
     char dst_ip[INET6_ADDRSTRLEN];
     uint16_t src_port;
@@ -35,6 +36,17 @@ typedef struct {
     uint64_t rx_packets; // Počet přijatých paketů
     uint64_t tx_packets; // Počet odeslaných paketů
 } connection_stat_t;
+*/
+
+typedef struct {
+    char src_ip[INET6_ADDRSTRLEN];
+    char dst_ip[INET6_ADDRSTRLEN];
+    uint16_t src_port;
+    uint16_t dst_port;
+    uint64_t rx_bytes;  // Přijaté bajty (RX)
+    uint64_t tx_bytes;  // Odeslané bajty (TX)
+    char protocol[10];
+} packet_info_t;
 
 /**
  * @brief 
