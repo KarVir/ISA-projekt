@@ -1,0 +1,21 @@
+.TH ISA-TOP 1
+.SH NAME
+isa-top \- display statistics of captured packets
+.SH SYNOPSIS
+.B isa-top
+.B -i interface
+[\f -s \fRb|p]
+[\f -t\fR num]
+.SH DESCRIPTION
+.B isa-top
+captures packets, calculates b/s and p/s, sorts by bytes/packets/s depending on the argument provided, and then displays the statistics. It always shows the top 10 most communicating packets.
+.SH OPTIONS
+.TP
+.BR \-i
+Sets the interface for packet capture.
+.TP
+.BR \-s
+Sets the output sorting by bytes/packets/s. Default value is b.
+.TP
+.BR \-t
+Sets the time interval for displaying statistics. Default value is 1.

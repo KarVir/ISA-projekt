@@ -7,6 +7,7 @@
  */
 
 #include "packet_handler.h"
+#include "sorting.h"
 
 int compare_bytes(const void* a, const void* b) {
     const packet_info_t* packetA = (const packet_info_t*)a;

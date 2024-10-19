@@ -1,5 +1,5 @@
 /**
- * @file isa-top.c
+ * @file display.h
  * @author Karolína Virágová,xvirag00
  * @brief ISA Project
  * 
@@ -13,10 +13,10 @@
 #include "packet_handler.h"
 #include "sorting.h"
 
+#ifndef DISPLAY_H
+#define DISPLAY_H
 /**
- * @brief Vlákno pro výpis statistiky
- * 
- * @param arg 
- * @return void* 
+ * @brief Thread to dump statistics
  */
 void* statistics_thread(void* arg);
+#endif // DISPLAY_H

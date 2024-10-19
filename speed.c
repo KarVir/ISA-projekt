@@ -8,40 +8,37 @@
 
 #include "speed.h"
 
-void unit_conversion(packet_info_t* user, int number){
-     packet_info_t *packets = user;
-    
-    if (packets[number].tx_bites >= 1000000000) {
-        packets[number].tx_bites /= 1000000000.0; // Převod na Gb
-        strcpy(packets[number].tx_units, "G");
-     } else if (packets[number].tx_bites >= 1000000) {
-        packets[number].tx_bites /= 1000000.0; // Převod na Mb
-        strcpy(packets[number].tx_units, "M");
-    } else if (packets[number].tx_bites >= 1000) {
-        packets[number].tx_bites /= 1000.0; // Převod na kb
-        strcpy(packets[number].tx_units, "k");
-    }
-
-    if (packets[number].rx_bites >= 1000000000) {
-        packets[number].rx_bites /= 1000000000.0; // Převod na Gb
-        strcpy(packets[number].rx_units, "G");
-     } else if (packets[number].rx_bites >= 1000000) {
-        packets[number].rx_bites /= 1000000.0; // Převod na Mb
-        strcpy(packets[number].rx_units, "M");
-    } else if (packets[number].rx_bites >= 1000) {
-        packets[number].rx_bites /= 1000.0; // Převod na kb
-        strcpy(packets[number].rx_units, "k");
+float unit_conversion(float value, char *units){
+  if (value >= 1000000000) {
+        strcpy(units, "G");
+        return value / 1000000000.0; // převod na Gb
+    } else if (value >= 1000000) {
+        strcpy(units, "M");
+        return value / 1000000.0; // převod na Mb
+    } else if (value >= 1000) {
+        strcpy(units, "k");
+        return value / 1000.0; // převod na kb
+    } else {
+        strcpy(units, "");
+        return value; // žádný převod
     }
 }
 
 void speed(packet_info_t* user, int number, int time){
     packet_info_t *packets= user;
 
+    // výpočet b/s
     packets[number].tx_bites = (packets[number].tx_byte * 8)/ time;
-
     packets[number].rx_bites = (packets[number].rx_byte * 8)/ time;
 
-   // packets[number].tx_packets = packets[number].count/ time;
+    // výpočet p/s
+    packets[number].tx_packets = packets[number].tx_packet/ time;
+    packets[number].rx_packets = packets[number].rx_packet/ time;
 
-   unit_conversion(packets, number);
-} 
+    // převodo na jednotky
+    packets[number].tx_bites = unit_conversion(packets[number].tx_bites, packets[number].tx_units);
+    packets[number].rx_bites = unit_conversion(packets[number].rx_bites, packets[number].rx_units);
+    packets[number].rx_packets = unit_conversion(packets[number].rx_packets, packets[number].rx_packets_units);
+    packets[number].tx_packets = unit_conversion(packets[number].tx_packets, packets[number].tx_packets_units);
+
+    } 

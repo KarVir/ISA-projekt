@@ -7,19 +7,15 @@
  */
 #include "vector.h"
 
+#ifndef SPEED_H
+#define SPEED_H
 /**
- * @brief
- * 
- * @param user 
- * @param number 
+ * @brief Adding units by value
  */
-void unit_conversion(packet_info_t* user, int number);
+float unit_conversion(float value, char *units);
 
 /**
- * @brief 
- * 
- * @param user 
- * @param number 
- * @param time 
+ * @brief Speed ​​calculation
  */
 void speed(packet_info_t* user, int number, int time);
+#endif // SPEED_H

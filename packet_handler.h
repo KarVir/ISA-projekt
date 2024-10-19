@@ -1,10 +1,14 @@
 /**
- * @file isa-top.c
+ * @file packet_handler,h
  * @author Karolína Virágová,xvirag00
  * @brief ISA Project
  * 
  * @date 2024-10-21 
  */
+
+#include <pcap/pcap.h>
+#include <pthread.h>
+#include <net/ethernet.h>
 #include <stdio.h>
 #include <getopt.h>
 #include <stdio.h>
@@ -12,49 +16,38 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <signal.h>
-#include <pcap/pcap.h>
-#include <pthread.h>
-#include <net/ethernet.h>
+#include <netinet/ip.h>   
+#include <netinet/tcp.h>   
+#include <netinet/udp.h>
 #include <unistd.h>
-#include <netinet/ip.h>
 #include <netinet/ip6.h>
 #include <netinet/if_ether.h>
-#include <netinet/tcp.h>
-#include <netinet/udp.h>
 #include <arpa/inet.h>
-#include <ncurses.h>
 #include <ifaddrs.h>
+
 #include "vector.h"
 
+#ifndef PACKET_HANDLER_H
+#define PACKET_HANDLER_H
+
 /**
- * @brief Vlákno pro zachytávání paketů
- * 
- * @param arg 
- * @return void* 
+ * @brief A packet capture thread
  */
 void* packet_capture_thread(void* arg);
 
 /**
- * @brief 
- * 
- * @param user 
- * @param __attribute__ 
- * @param packet 
- */
-void packet_handler(unsigned char *user, const struct pcap_pkthdr *header __attribute__((unused)), const unsigned char *packet);
-
-/**
- * @brief 
- * 
- * @param packet 
- * @param new_packet 
+ * @brief Features for handling IPv4 packets
  */
 void process_ipv4_packet(const unsigned char *packet, packet_info_t *new_packet);
 
 /**
- * @brief 
- * 
- * @param packet 
- * @param new_packet 
+ * @brief Features for handling IPv6 packets
  */
 void process_ipv6_packet(const unsigned char *packet, packet_info_t *new_packet);
+
+
+/**
+ * @brief Callback function for captured packets
+ */
+void packet_handler(unsigned char *user, const struct pcap_pkthdr *header __attribute__((unused)), const unsigned char *packet);
+#endif // PACKET_HANDLER_H

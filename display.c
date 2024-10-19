@@ -1,5 +1,5 @@
 /**
- * @file isa-top.c
+ * @file display.c
  * @author Karolína Virágová,xvirag00
  * @brief ISA Project
  * 
@@ -8,6 +8,7 @@
 
 #include "display.h"
 #include "speed.h"
+#include <ncurses.h>
 
 void* statistics_thread(void* arg) {
     thread_args_t* thread_args = (thread_args_t*)arg;
@@ -35,14 +36,18 @@ void* statistics_thread(void* arg) {
         for (int i = 0; i < 10; i++)
         {
             speed(packets->data, i, thread_args->args.time);
-            mvprintw(i + 2, 0, "%s: %u\t%s: %u\t%s\t%.1f %s\t%u\t%.1f %s\t%u\n", packets->data[i].src_ip, packets->data[i].src_port, 
+            mvprintw(i + 2, 0, "%s: %u\t%s: %u\t%s\t%.1f %s\t%.1f %s\t%.1f %s\t%.1f %s\n", packets->data[i].src_ip, packets->data[i].src_port, 
             packets->data[i].dst_ip, packets->data[i].dst_port, packets->data[i].protocol,
-            packets->data[i].rx_bites, packets->data[i].rx_units, packets->data[i].rx_packets, 
-            packets->data[i].tx_bites, packets->data->tx_units, packets->data[i].tx_packets);
+            packets->data[i].rx_bites, packets->data[i].rx_units, packets->data[i].rx_packets, packets->data[i].rx_packets_units, 
+            packets->data[i].tx_bites, packets->data->tx_units, packets->data[i].tx_packets,  packets->data[i].rx_packets_units);
             packets->data[i].tx_bites = 0;
             packets->data[i].rx_bites = 0;
-            packets->data[i].tx_packets = 0;
-            packets->data[i].rx_packets = 0;
+            packets->data[i].tx_packet = 0;
+            packets->data[i].rx_packet = 0;
+            packets->data[i].rx_byte = 0;
+            packets->data[i].tx_byte = 0;
+            strcpy(packets->data[i].tx_units, "");
+            strcpy(packets->data[i].rx_units, "");
         }
 
         pthread_mutex_unlock(&thread_args->vector_mutex); // Odemknutí mutexu po přístupu k vektoru

@@ -5,17 +5,21 @@
  * 
  * @date 2024-10-21 
  */
+ /**
+  * TODO ceske komenty pryc
+  */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <pcap.h>
 #include <pthread.h>
+#include <stdbool.h>
 
 #ifndef VECTOR_H
 #define VECTOR_H
 
 /**
- * @brief struktura zahrnující argumenty programu
+ * @brief Struct of arguments program
  */
 typedef struct {
     int time;
@@ -24,27 +28,31 @@ typedef struct {
 } arg_t;
 
 /**
- * @brief 
+ * @brief Information about packet
  */
 typedef struct packet_info_t {
     char src_ip[16];   // Zdrojová IP adresa
     char dst_ip[16];   // Cílová IP adresa
     unsigned int src_port;  // Zdrojový port
     unsigned int dst_port;  // Cílový port
-    char protocol[8];  
-    unsigned int byte; // Protokol (TCP, UDP atd.)
-    unsigned int rx_byte;  // Přijaté bajty
+    char protocol[8];   // Protokol (TCP, UDP atd.)
+    unsigned int byte;  //velikost paketu 
+    unsigned int rx_byte;
     unsigned int tx_byte;
-    float rx_bites;  // Odeslané bajty
+    float rx_bites;  
     float tx_bites;
     char rx_units[2];
     char tx_units[2];
-     uint16_t rx_packets;
-     uint16_t tx_packets;
+    float rx_packets;
+    float tx_packets;
+    int tx_packet;
+    int rx_packet;
+    char rx_packets_units[2];
+    char tx_packets_units[2];
 } packet_info_t;
 
 /**
- * @brief 
+ * @brief Structure for storing packets
  */
 typedef struct packet_vector_t {
     packet_info_t *data;  // Dynamické pole struktur packet_info_t
@@ -53,7 +61,7 @@ typedef struct packet_vector_t {
 } packet_vector_t;
 
 /**
- * @brief globalní struktura
+ * @brief Global struct
  */
 typedef struct {
     pcap_t *handle;
@@ -64,24 +72,17 @@ typedef struct {
 } thread_args_t;
 
 /**
- * @brief Funkce pro inicializaci vektoru
- * 
- * @param vector 
+ * @brief Initialization vector
  */
 void init_packet_vector(packet_vector_t *vector);
 
 /**
- * @brief přidání paketů do vektru
- * 
- * @param arg 
- * @param packet 
+ * @brief Adding packets to the vector
  */
 void add_packet_to_vector(void* arg, packet_info_t packet);
 
 /**
- * @brief uvolnění vektru
- * 
- * @param vector 
+ * @brief Release vector
  */
 void free_packet_vector(packet_vector_t *vector);
 #endif // VECTOR_H
