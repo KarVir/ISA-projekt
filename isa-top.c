@@ -10,6 +10,7 @@
 #include "vector.h"
 #include "display.h"
 #include <pcap.h>
+#include <ctype.h>
 
 thread_args_t* thread_args;
 
@@ -18,6 +19,7 @@ void signal_handler(int sig) {
         // Break pcap
         pcap_breakloop(thread_args->handle);
         thread_args->break_while = true;
+        fprintf(stderr, "SIGINT received\n");  // Přidejte tuto řádku pro výpis zprávy
     }
 }
 
@@ -41,6 +43,22 @@ void print_interfaces() {
     }
 
     pcap_freealldevs(alldevs);
+}
+
+int is_valid_number(const char *str) {
+    // Pokud je řetězec prázdný
+    if (str == NULL || *str == '\0') {
+        return 0; // Neplatné
+    }
+
+    // Zkontrolujte každý znak v řetězci
+    for (size_t i = 0; i < strlen(str); i++) {
+        if (!isdigit(str[i])) {
+            return 0; // Pokud najdeme nečíselný znak
+        }
+    }
+    
+    return 1; // Platný číslo
 }
 
 int main(int argc, char* argv[])
@@ -91,7 +109,16 @@ int main(int argc, char* argv[])
                 if (optarg == NULL) {
                     break;
                 }
-                thread_args->args.time = atoi(optarg);
+                if (is_valid_number(optarg)) {
+                    thread_args->args.time = atoi(optarg); // Převedení řetězce na celé číslo
+                    if (thread_args->args.time <= 0) {
+                        fprintf(stderr, "Error: Invalid time. Must be greater than 0.\n");
+                        exit(EXIT_FAILURE);
+                    }
+                } else {
+                    fprintf(stderr, "Error: Invalid time. Must be a numeric value.\n");
+                    exit(EXIT_FAILURE);
+                }
                 break;
             default:
                 return EXIT_FAILURE;
@@ -104,11 +131,6 @@ int main(int argc, char* argv[])
     if (!interface_provided) {
         fprintf(stderr, "Error: No interface specified.\n");
         print_interfaces();
-        exit(EXIT_FAILURE);
-    }
-
-    if (thread_args->args.time <= 0) {
-        fprintf(stderr, "Error: Invalid time. Must be greater than 0.\n");
         exit(EXIT_FAILURE);
     }
 
