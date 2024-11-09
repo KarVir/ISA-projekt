@@ -15,6 +15,7 @@
 
 #ifndef DISPLAY_H
 #define DISPLAY_H
+
 /**
  * @brief Thread to dump statistics
  */

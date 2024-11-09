@@ -19,7 +19,6 @@ void signal_handler(int sig) {
         // Break pcap
         pcap_breakloop(thread_args->handle);
         thread_args->break_while = true;
-        fprintf(stderr, "SIGINT received\n");  // Přidejte tuto řádku pro výpis zprávy
     }
 }
 
@@ -45,20 +44,18 @@ void print_interfaces() {
     pcap_freealldevs(alldevs);
 }
 
-int is_valid_number(const char *str) {
-    // Pokud je řetězec prázdný
+bool is_valid_number(const char *str) {
+    //If the string is empty
     if (str == NULL || *str == '\0') {
-        return 0; // Neplatné
+        return false;
     }
-
-    // Zkontrolujte každý znak v řetězci
+    // Check each character in the string
     for (size_t i = 0; i < strlen(str); i++) {
         if (!isdigit(str[i])) {
-            return 0; // Pokud najdeme nečíselný znak
+            return false; 
         }
     }
-    
-    return 1; // Platný číslo
+    return true;
 }
 
 int main(int argc, char* argv[])
@@ -81,23 +78,26 @@ int main(int argc, char* argv[])
     }
 
     thread_args->break_while = false;
+    thread_args->args.interface_provided = 0;  // Mark that interface was provided
+    thread_args->args.pcap_file_provided = 0;  // Mark that interface was provided
+
     init_packet_vector(thread_args->packets);
     pthread_t capture_thread, stats_thread;
 
     int opt;
-    int interface_provided = 0;  // Track if interface is provided
     
     /**
      * Parsing input arguments
     */
-    while ((opt = getopt(argc, argv, "i:s:t:")) != -1) {
+    while ((opt = getopt(argc, argv, "i:s:t:r:")) != -1) {
         switch (opt) {
             case 'i':
-                if (optarg == NULL) {
-                    break;
+                  if (optarg == NULL || *optarg == '-') {
+                    print_interfaces();
+                    exit(EXIT_FAILURE);
                 }
                 strncpy(thread_args->args.interface, optarg, 254);
-                interface_provided = 1;  // Mark that interface was provided
+                thread_args->args.interface_provided = 1; 
                 break;
             case 's':
                 if (optarg == NULL) {    
@@ -110,15 +110,21 @@ int main(int argc, char* argv[])
                     break;
                 }
                 if (is_valid_number(optarg)) {
-                    thread_args->args.time = atoi(optarg); // Převedení řetězce na celé číslo
-                    if (thread_args->args.time <= 0) {
-                        fprintf(stderr, "Error: Invalid time. Must be greater than 0.\n");
-                        exit(EXIT_FAILURE);
-                    }
+                    // converting a string to an integer
+                    thread_args->args.time = atoi(optarg);
                 } else {
                     fprintf(stderr, "Error: Invalid time. Must be a numeric value.\n");
                     exit(EXIT_FAILURE);
+                
                 }
+                    break;
+            case 'r':
+               if (optarg == NULL || *optarg == '-') {
+                    fprintf(stderr, "Error: Mistake pcap file\n");
+                    exit(EXIT_FAILURE);
+                }
+                strncpy(thread_args->args.pcap_file_path, optarg, 255);
+                thread_args->args.pcap_file_provided = 1;  // Mark that interface was provided
                 break;
             default:
                 return EXIT_FAILURE;
@@ -128,9 +134,14 @@ int main(int argc, char* argv[])
     /**
      * @brief Check arguments
      */
-    if (!interface_provided) {
-        fprintf(stderr, "Error: No interface specified.\n");
+
+    if (!thread_args->args.interface_provided && !thread_args->args.pcap_file_provided) {
+        fprintf(stderr, "Error: No interface or PCAP file specified.\n");
         print_interfaces();
+        exit(EXIT_FAILURE);
+    }
+    if (thread_args->args.pcap_file_provided && thread_args->args.interface_provided) {
+        fprintf(stderr, "Error: Specify either interface (-i) or PCAP file (-r), not both.\n");
         exit(EXIT_FAILURE);
     }
 
@@ -138,6 +149,11 @@ int main(int argc, char* argv[])
         fprintf(stderr, "Error: Invalid sorting criteria. Must be 'b' or 'p'.\n");
         exit(EXIT_FAILURE);
     } 
+
+    if (thread_args->args.time <= 0) {
+        fprintf(stderr, "Error: Invalid time. Must be greater than 0.\n");
+        exit(EXIT_FAILURE);
+    }
 
     // Mutex initialization
     if (pthread_mutex_init(&thread_args->vector_mutex, NULL) != 0) {

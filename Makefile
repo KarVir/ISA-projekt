@@ -6,7 +6,7 @@
 ######################################
 
 TARGET                 = isa-top
-ZIPNAME = xvirag00.zip
+TARNAME = xvirag00
 C                = g++
 CPPFLAGS               = -std=c++20
 EXTRA_CPPFLAGS         = -Wall -Wextra -pedantic -lpcap -lncurses
@@ -15,7 +15,7 @@ ${TARGET}: ${SRCS}
 	${C} ${CPPFLAGS} ${EXTRA_CPPFLAGS} -o ${TARGET} ${SRCS}
 	
 clean:
-	rm isa-top
+	rm isa-top *.tar
 
-zip: 
-	zip -v -r ${ZIPNAME} .* 
+tar: 
+	tar -cvf ${TARNAME}.tar *.h *.c Makefile isa-top.1

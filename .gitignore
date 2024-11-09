@@ -5,3 +5,7 @@ isa-top
 txt
 Makefile copy
 /01_test
+zkusit.c
+test-isatop.py
+/__pycache__
+/.pytest_cache

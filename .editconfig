@@ -1,0 +1,10 @@
+; indicate this is the root of the project
+root = true
+
+[Makefile]
+indent_style = tab
+
+[*.{c,h}]
+indent_size = 4
+indent_style = space
+end_of_line = lf
