@@ -17,8 +17,11 @@ thread_args_t* thread_args;
 void signal_handler(int sig) {
     if (sig == SIGINT) {
         // Break pcap
+    pthread_mutex_lock(&thread_args->vector_mutex);
         pcap_breakloop(thread_args->handle);
         thread_args->break_while = true;
+        pthread_mutex_unlock(&thread_args->vector_mutex);
+
     }
 }
 
@@ -76,10 +79,12 @@ int main(int argc, char* argv[])
         free(thread_args);
         return 1;
     }
-
+    thread_args->handle= NULL;
     thread_args->break_while = false;
     thread_args->args.interface_provided = 0;  // Mark that interface was provided
     thread_args->args.pcap_file_provided = 0;  // Mark that interface was provided
+        strcpy( thread_args->args.pcap_file_path, "");
+        strcpy( thread_args->args.interface, "");
 
     init_packet_vector(thread_args->packets);
     pthread_t capture_thread, stats_thread;

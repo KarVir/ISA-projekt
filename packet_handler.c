@@ -78,6 +78,7 @@ void packet_handler(unsigned char *user, const struct pcap_pkthdr *header __attr
     thread_args_t* thread_args = (thread_args_t*)user;
 
     packet_info_t new_packet;
+    memset(&new_packet, 0, sizeof(packet_info_t));
     const struct ether_header *ethernet = (struct ether_header *)packet;
     
     switch (ntohs(ethernet->ether_type)) {

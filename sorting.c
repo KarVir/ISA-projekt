@@ -22,7 +22,7 @@ int compare_pakets(const void* a, const void* b) {
     const packet_info_t* packetA = (const packet_info_t*)a;
     const packet_info_t* packetB = (const packet_info_t*)b;
 
-    if ((packetA->rx_packets + packetA->tx_packets) > (packetB->rx_packets + packetB->tx_packets)) return -1;
-    if ((packetA->rx_packets + packetA->tx_packets) < (packetB->rx_packets + packetB->tx_packets)) return 1;
+    if ((packetA->rx_packets + packetA->tx_packet_count) > (packetB->rx_packets + packetB->tx_packet_count)) return -1;
+    if ((packetA->rx_packets + packetA->tx_packet_count) < (packetB->rx_packets + packetB->tx_packet_count)) return 1;
     return 0;
 }

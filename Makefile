@@ -9,7 +9,7 @@ TARGET                 = isa-top
 TARNAME = xvirag00
 C                = g++
 CPPFLAGS               = -std=c++20
-EXTRA_CPPFLAGS         = -Wall -Wextra -pedantic -lpcap -lncurses
+EXTRA_CPPFLAGS         = -Wall -Wextra -pedantic -lpcap -lncurses -lpthread
 SRCS     = isa-top.c vector.c speed.c display.c sorting.c packet_handler.c 
 ${TARGET}: ${SRCS} 
 	${C} ${CPPFLAGS} ${EXTRA_CPPFLAGS} -o ${TARGET} ${SRCS}

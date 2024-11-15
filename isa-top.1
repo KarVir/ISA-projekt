@@ -4,6 +4,7 @@ isa-top \- display statistics of captured packets
 .SH SYNOPSIS
 .B isa-top
 .B -i interface
+.B | -r file
 [\f -s \fRb|p]
 [\f -t\fR num]
 .SH DESCRIPTION
@@ -13,6 +14,9 @@ captures packets, calculates b/s and p/s, sorts by bytes/packets/s depending on 
 .TP
 .BR \-i
 Sets the interface for packet capture.
+.TP Sets pcap capture file
+.BR \-r
+Set offline packet capture with .pcap file
 .TP
 .BR \-s
 Sets the output sorting by bytes/packets/s. Default value is b.
